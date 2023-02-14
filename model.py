@@ -2,9 +2,10 @@ from transformers import VisionEncoderDecoderModel, ViTFeatureExtractor, AutoTok
 import torch
 from PIL import Image
 from flask import Flask,render_template,jsonify,request
-import os
+from flask_cors import CORS
 app=Flask(__name__)
 
+CORS(app)
 
 #home page
 @app.route('/')
