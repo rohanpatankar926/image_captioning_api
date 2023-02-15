@@ -74,7 +74,7 @@ def predict_step():
       buffer = BytesIO()
       i_image.save(buffer, format="PNG")
       img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
-
+      print(img_str)
       return render_template("home.html",prediction="".join(preds),image=img_str)
     except Exception as e:
       return jsonify({'predictions': str(e)})
