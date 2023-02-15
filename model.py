@@ -22,7 +22,8 @@ CORS(app)
 #home page
 @app.route('/')
 def home():
-  return render_template('home.html')
+  objects=available_objects()
+  return render_template('home.html',objects=objects)
 
 model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
 feature_extractor = ViTFeatureExtractor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
@@ -39,6 +40,7 @@ gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
 
 @app.route("/upload", methods=["POST"])
 def upload_img_s3():
+    objects=available_objects()
     s3 = boto3.resource("s3", aws_access_key_id=getenv("ACCESS_KEY"), aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"))
     try:
         file = request.files['file']
@@ -46,15 +48,28 @@ def upload_img_s3():
         s3.Bucket(getenv("BUCKET_NAME")).put_object(Key=request.form['key'], Body=encoded_image)
         print("uploaded to s3")
         uploaded_message=f"{file} uploaded successfully"
-        return render_template("home.html",uploaded_message=f'''{uploaded_message.split("'")[1]} uploaded successfully''')
+        return render_template("home.html",uploaded_message=f'''{uploaded_message.split("'")[1]} uploaded successfully''',objects=objects)
     except Exception as e:
         print(e)
         return "ERROR"
 
 
+def available_objects():
+    try:
+        my_bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
+        objects=[obj.key for obj in my_bucket.objects.all()]
+        return objects
+    except Exception as e:
+        print(e)
+        return []
+
+
+
+
 @app.route("/predict", methods=['POST'])
 def predict_step():
     try:
+      objects=available_objects()
       image_paths = request.form.get('image_paths')
       image_obj=bucket.Object(image_paths).get()['Body'].read()
       image_bytes = base64.b64decode(image_obj)
@@ -75,9 +90,9 @@ def predict_step():
       i_image.save(buffer, format="PNG")
       img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
       print(img_str)
-      return render_template("home.html",prediction="".join(preds),image=img_str)
+      return render_template("home.html",prediction="".join(preds),image=img_str,objects=objects)
     except Exception as e:
       return jsonify({'predictions': str(e)})
   
 if __name__ == '__main__':
-  app.run(debug=True,port=8130,host="0.0.0.0")
+  app.run(debug=True,port=8230,host="0.0.0.0")
