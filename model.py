@@ -46,7 +46,7 @@ def upload_img_s3():
         s3.Bucket(getenv("BUCKET_NAME")).put_object(Key=request.form['key'], Body=encoded_image)
         print("uploaded to s3")
         uploaded_message=f"{file} uploaded successfully"
-        return render_template("home.html",uploaded_message=uploaded_message)
+        return render_template("home.html",uploaded_message=f'''{uploaded_message.split("'")[1]} uploaded successfully''')
     except Exception as e:
         print(e)
         return "ERROR"
