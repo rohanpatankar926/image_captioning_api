@@ -59,6 +59,7 @@ def predict_step():
       image_obj=bucket.Object(image_paths).get()['Body'].read()
       image_bytes = base64.b64decode(image_obj)
       i_image = Image.open(BytesIO(image_bytes))
+      
       print(i_image)
       if i_image.mode != "RGB":
           i_image = i_image.convert(mode="RGB")
@@ -70,7 +71,11 @@ def predict_step():
       preds = tokenizer.batch_decode(output_ids, skip_special_tokens=True)
       preds = [pred.strip() for pred in preds]
 
-      return jsonify({'predictions': preds})
+      buffer = BytesIO()
+      i_image.save(buffer, format="PNG")
+      img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+      return render_template("home.html",prediction="".join(preds),image=img_str)
     except Exception as e:
       return jsonify({'predictions': str(e)})
   
