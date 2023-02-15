@@ -9,6 +9,7 @@ from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
 import boto3
+import os
 
 s3=boto3.resource("s3",aws_access_key_id=getenv("ACCESS_KEY"),aws_secret_access_key=getenv("SECRET_ACCESS_KEY"))
 bucket=s3.Bucket(getenv("BUCKET_NAME"))
@@ -35,6 +36,22 @@ max_length = 16
 num_beams = 4
 gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
 
+
+@app.route("/upload", methods=["POST"])
+def upload_img_s3():
+    s3 = boto3.resource("s3", aws_access_key_id=getenv("ACCESS_KEY"), aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"))
+    try:
+        file = request.files['file']
+        encoded_image = base64.b64encode(file.read())
+        s3.Bucket(getenv("BUCKET_NAME")).put_object(Key=request.form['key'], Body=encoded_image)
+        print("uploaded to s3")
+        uploaded_message=f"{file} uploaded successfully"
+        return render_template("home.html",uploaded_message=uploaded_message)
+    except Exception as e:
+        print(e)
+        return "ERROR"
+
+
 @app.route("/predict", methods=['POST'])
 def predict_step():
     try:
@@ -58,4 +75,4 @@ def predict_step():
       return jsonify({'predictions': str(e)})
   
 if __name__ == '__main__':
-  app.run(debug=True,port=8000,host="0.0.0.0")
+  app.run(debug=True,port=8130,host="0.0.0.0")

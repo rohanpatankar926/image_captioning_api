@@ -1,36 +1,69 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Image Prediction Demo</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  </head>
-  <body>
-    <form id="image-form">
-      <h3>This input field take data from s3 client</h3>
-      <label for="image-path">Image Path:</label>
-      <input type="text" id="image-path" name="image_paths">
-      <input type="submit" value="Predict">
-    </form>
-    <div id="predictions"></div>
 
-    <script>
-      $(document).ready(function() {
-        $("#image-form").submit(function(event) {
-          event.preventDefault();
-          var imagePath = $("#image-path").val();
-          $.ajax({
-            url: "/predict",
-            type: "POST",
-            data: {image_paths: imagePath},
-            success: function(response) {
-              $("#predictions").html(response.predictions);
-            },
-            error: function(xhr, status, error) {
-              console.log("Error: " + error);
-            }
-          });
+<head>
+  <title>Image Captioning</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container my-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header text-center">
+            <h3 class="mb-0">Image Captioning</h3>
+          </div>
+          <div class="card-body">
+            <form id="image-form">
+              <div class="mb-3">
+                <label for="image-path" class="form-label">Image Path:</label>
+                <input type="text" id="image-path" name="image_paths" class="form-control" required>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Predict</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="mt-4" id="predictions"></div>
+      </div>
+    </div>
+  </div>
+  </p>
+
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <label for="file">Choose a file to upload:</label>
+    <input type="file" name="file" id="file"><br>
+    <label for="key">S3 key name:</label>
+    <input type="text" name="key" id="key"><br>
+    <input type="submit" value="Upload">
+    <h4>{{ uploaded_message }}</h4>
+  </form>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function () {
+      $("#image-form").submit(function (event) {
+        event.preventDefault();
+        var imagePath = $("#image-path").val();
+        $.ajax({
+          url: "/predict",
+          type: "POST",
+          data: { image_paths: imagePath },
+          success: function (response) {
+            $("#predictions").html(response.predictions);
+          },
+          error: function (xhr, status, error) {
+            console.log("Error: " + error);
+          }
         });
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
+
 </html>
