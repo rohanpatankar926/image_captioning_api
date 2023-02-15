@@ -1,8 +1,19 @@
 from transformers import VisionEncoderDecoderModel, ViTFeatureExtractor, AutoTokenizer
 import torch
 from PIL import Image
+import base64
+from io import BytesIO
 from flask import Flask,render_template,jsonify,request
 from flask_cors import CORS
+from os import getenv
+from dotenv import load_dotenv
+load_dotenv()
+import boto3
+
+s3=boto3.resource("s3",aws_access_key_id=getenv("ACCESS_KEY"),aws_secret_access_key=getenv("SECRET_ACCESS_KEY"))
+bucket=s3.Bucket(getenv("BUCKET_NAME"))
+print(bucket)
+
 app=Flask(__name__)
 
 CORS(app)
@@ -27,15 +38,15 @@ gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
 @app.route("/predict", methods=['POST'])
 def predict_step():
     try:
-      image_paths = request.form.get('image_paths').split(',')
-      images = []
-      for image_path in image_paths:
-          i_image = Image.open(image_path)
-          if i_image.mode != "RGB":
-              i_image = i_image.convert(mode="RGB")
-          images.append(i_image)
+      image_paths = request.form.get('image_paths')
+      image_obj=bucket.Object(image_paths).get()['Body'].read()
+      image_bytes = base64.b64decode(image_obj)
+      i_image = Image.open(BytesIO(image_bytes))
+      print(i_image)
+      if i_image.mode != "RGB":
+          i_image = i_image.convert(mode="RGB")
 
-      pixel_values = feature_extractor(images=images, return_tensors="pt").pixel_values
+      pixel_values = feature_extractor(images=[i_image], return_tensors="pt").pixel_values
       pixel_values = pixel_values.to(device)
 
       output_ids = model.generate(pixel_values, **gen_kwargs)
