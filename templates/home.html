@@ -12,46 +12,6 @@
     overflow-y: auto;
   }
   </style>
-<!-- <body>
-  <div class="container my-4">
-    <div class="row justify-content-center">
-      <div class="col-lg-6">
-        <div class="card">
-          <div class="card-header text-center">
-            <h3 class="mb-0">Image Captioning</h3>
-          </div>
-          <div class="card-body">
-            <form id="image-form" action="/predict" method="post" enctype="multipart/form-data">
-              <div class="mb-3">
-                <label for="image-path" class="form-label">Image Path:</label>
-                <input type="text" id="image-path" name="image_paths" class="form-control" required>
-              </div>
-              <div class="text-center">
-                <button type="submit" class="btn btn-primary">Predict</button>
-              </div>
-              {% if prediction %}
-              <h2>Prediction: {{ prediction }}</h2>
-              <img src="data:image/png;base64,{{ image }}" width="300" height="300">
-            {% endif %}
-          
-
-            </form>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-  </p>
-
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <label for="file">Choose a file to upload:</label>
-    <input type="file" name="file" id="file"><br>
-    <label for="key">S3 key name:</label>
-    <input type="text" name="key" id="key"><br>
-    <input type="submit" value="Upload">
-    <h4>{{ uploaded_message }}</h4>
-  </form> -->
 
   <body>
     <nav class="navbar navbar-expand-lg navbar navbar-dark bg-dark">
@@ -67,6 +27,7 @@
         </div>
       </div>
     </nav>
+    <br>
     <div class="card-header text-center">
     <h1 class="mb-1">Welcome to image captioning project</h1>
     </div>
