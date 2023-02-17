@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import boto3
 import os
-
+import pyttsx3
 s3=boto3.resource("s3",aws_access_key_id=getenv("ACCESS_KEY"),aws_secret_access_key=getenv("SECRET_ACCESS_KEY"))
 bucket=s3.Bucket(getenv("BUCKET_NAME"))
 print(bucket)
@@ -86,10 +86,16 @@ def predict_step():
       preds = tokenizer.batch_decode(output_ids, skip_special_tokens=True)
       preds = [pred.strip() for pred in preds]
 
+
       buffer = BytesIO()
       i_image.save(buffer, format="PNG")
       img_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
       print(img_str)
+      engine=pyttsx3.init()
+      engine.setProperty('rate', 150)
+      engine.say("".join(preds))
+      engine.runAndWait()
+
       return render_template("home.html",prediction="".join(preds),image=img_str,objects=objects)
     except Exception as e:
       return jsonify({'predictions': str(e)})
