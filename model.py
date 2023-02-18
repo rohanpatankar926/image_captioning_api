@@ -44,9 +44,11 @@ def upload_img_s3():
     s3 = boto3.resource("s3", aws_access_key_id=getenv("ACCESS_KEY"), aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"))
     try:
         file = request.files['file']
+        key=request.form['key']
+        if (obj.key==key for obj in bucket.objects.all()):
+            return render_template("home.html",uploaded_message=f'''The key named {key} already exists''',objects=objects)
         encoded_image = base64.b64encode(file.read())
-        s3.Bucket(getenv("BUCKET_NAME")).put_object(Key=request.form['key'], Body=encoded_image)
-        print("uploaded to s3")
+        s3.Bucket(getenv("BUCKET_NAME")).put_object(Key=key, Body=encoded_image)
         uploaded_message=f"{file} uploaded successfully"
         return render_template("home.html",uploaded_message=f'''{uploaded_message.split("'")[1]} uploaded successfully''',objects=objects)
     except Exception as e:
@@ -101,4 +103,4 @@ def predict_step():
       return jsonify({'predictions': str(e)})
   
 if __name__ == '__main__':
-  app.run(debug=True,port=8230,host="0.0.0.0")
+  app.run(debug=True,port=4040,host="0.0.0.0")
