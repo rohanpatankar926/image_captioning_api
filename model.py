@@ -45,7 +45,7 @@ def upload_img_s3():
     try:
         file = request.files['file']
         key=request.form['key']
-        if (obj.key==key for obj in bucket.objects.all()):
+        if any(obj.key==key for obj in bucket.objects.all()):
             return render_template("home.html",uploaded_message=f'''The key named {key} already exists''',objects=objects)
         encoded_image = base64.b64encode(file.read())
         s3.Bucket(getenv("BUCKET_NAME")).put_object(Key=key, Body=encoded_image)
