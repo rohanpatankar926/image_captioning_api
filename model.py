@@ -25,9 +25,9 @@ def home():
   objects=available_objects()
   return render_template('home.html',objects=objects)
 
-model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-feature_extractor = ViTFeatureExtractor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+model = VisionEncoderDecoderModel.from_pretrained("jaimin/image_caption")
+feature_extractor = ViTFeatureExtractor.from_pretrained("jaimin/image_caption")
+tokenizer = AutoTokenizer.from_pretrained("jaimin/image_caption")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
