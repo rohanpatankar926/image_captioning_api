@@ -4,3 +4,5 @@ flask
 flask_cors
 pillow
 python-dotenv
+boto3
+pyttsx3
